@@ -1,0 +1,11 @@
+Tuesday, February 11, 2025
+
+ACTIONABLE
+(1) web app wired up 
+(2) get docker going 
+
+
+BIG BUGS / ISSUES 
+1) we need to deal with the directory and file save issues
+2) we need to deal with the file size / resolution issue 
+3) 

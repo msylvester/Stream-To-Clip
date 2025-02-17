@@ -1,0 +1,29 @@
+# Video processing
+moviepy>=1.0.3
+opencv-python>=4.8.0
+ffmpeg-python>=0.2.0
+
+# Audio processing
+pydub>=0.25.1
+librosa>=0.10.0
+soundfile>=0.12.1
+
+# Machine Learning & GPU
+torch>=2.0.0
+transformers>=4.30.0
+accelerate>=0.20.0
+whisper>=1.0.0
+
+# OpenAI and API
+openai>=1.0.0
+python-dotenv>=1.0.0
+
+# Utilities
+numpy>=1.24.0
+pandas>=2.0.0
+tqdm>=4.65.0
+regex>=2023.0.0
+
+# File handling
+requests>=2.31.0
+json5>=0.9.14
