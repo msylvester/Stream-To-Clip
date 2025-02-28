@@ -10,8 +10,6 @@ from datetime import timedelta
 from pydub import AudioSegment
 import librosa
 import soundfile as sf
-import os
-import atexit
 
 def format_time(seconds):
     """Convert seconds into human readable time string"""
@@ -79,18 +77,12 @@ def extract_audio(video_path):
     video_file = Path(video_path)
     audio_path = video_file.with_suffix('.wav')
     
-    print(f"Extracting audio to {audio_path}...")
-    
     subprocess.run([
         'ffmpeg', '-i', str(video_file), 
         '-vn', '-acodec', 'pcm_s16le', 
         '-ar', '16000', '-ac', '1', 
         str(audio_path)
     ])
-    
-    # Register audio file for cleanup
-    global files_to_cleanup
-    files_to_cleanup.append(str(audio_path))
     
     return audio_path
 
@@ -180,21 +172,6 @@ def transcribe_with_features(model, audio_path, device, min_duration=15.0):
     
     return enhanced_segments
 
-def cleanup_files():
-    """Clean up temporary files created during processing"""
-    global files_to_cleanup
-    print("\nCleaning up temporary files...")
-    for file_path in files_to_cleanup:
-        try:
-            if os.path.exists(file_path):
-                os.unlink(file_path)
-                print(f"Removed file: {file_path}")
-        except Exception as e:
-            print(f"Warning: Failed to remove {file_path}: {e}")
-
-# Global list to track files for cleanup
-files_to_cleanup = []
-
 def process_video(video_path, model_size="base"):
     """Process video to create enhanced transcription"""
     process_start = time.time()
@@ -205,29 +182,23 @@ def process_video(video_path, model_size="base"):
     
     print(f"Processing {video_file.name}...")
     
-    try:
-        audio_path = extract_audio(video_path)
-        
-        print(f"Loading Whisper {model_size} model...")
-        model = whisper.load_model(model_size)
-        if device == "cuda":
-            model = model.cuda()
-        
-        enhanced_transcription = transcribe_with_features(model, audio_path, device)
-        
-        with open(transcription_path, 'w', encoding='utf-8') as f:
-            json.dump(enhanced_transcription, f, indent=2, ensure_ascii=False)
-        
-        process_end = time.time()
-        print(f"Total processing time: {format_time(process_end - process_start)}")
-        print(f"Enhanced transcription saved to {transcription_path}")
-        
-    except Exception as e:
-        print(f"Error processing video: {str(e)}")
-        raise
-    finally:
-        # Clean up the audio file even if there was an error
-        cleanup_files()
+    audio_path = extract_audio(video_path)
+    
+    print(f"Loading Whisper {model_size} model...")
+    model = whisper.load_model(model_size)
+    if device == "cuda":
+        model = model.cuda()
+    
+    enhanced_transcription = transcribe_with_features(model, audio_path, device)
+    
+    with open(transcription_path, 'w', encoding='utf-8') as f:
+        json.dump(enhanced_transcription, f, indent=2, ensure_ascii=False)
+    
+    audio_path.unlink()
+    
+    process_end = time.time()
+    print(f"Total processing time: {format_time(process_end - process_start)}")
+    print(f"Enhanced transcription saved to {transcription_path}")
 
 def main():
     parser = argparse.ArgumentParser(description='Create enhanced transcription with audio features')
@@ -239,15 +210,7 @@ def main():
                       help='Minimum duration in seconds for combined segments')
     
     args = parser.parse_args()
-    
-    # Register cleanup function to run at exit
-    atexit.register(cleanup_files)
-    
-    try:
-        process_video(args.video_path, model_size=args.model)
-    except Exception as e:
-        print(f"Failed to process video: {str(e)}")
-        sys.exit(1)
+    process_video(args.video_path, model_size=args.model)
 
 if __name__ == "__main__":
     main()
