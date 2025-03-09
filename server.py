@@ -72,15 +72,16 @@ def get_video_options_task(self, url):
         }
 
 @celery.task(bind=True)
-def process_video_task(self, url, resolution):
-    """Celery task to process video with the specified URL and resolution."""
-    print('here is a testy test')
+def process_video_task(self, url, resolution, uuid):
+    """Celery task to process video with the specified URL, resolution, and UUID."""
+    print('Processing video with UUID:', uuid)
     try:
         # Change directory to mac_version
         mac_version_path = Path(__file__).parent / 'mac_version'
 
-        # Execute the video processing script
-        command = ['python', 'process_vid_v2.py', url, resolution]
+        # Execute the updated video processing script with UUID
+        print("here we go") 
+        command = ['python', 'process_vid_v3.py', url, resolution, uuid]
         print(f"Executing command: {' '.join(command)}")
         
         # Run the process and wait for it to complete
@@ -125,7 +126,8 @@ def process_video_task(self, url, resolution):
             'success': True,
             'videos': generated_videos,
             'script_output': stdout,
-            'task_id': self.request.id
+            'task_id': self.request.id,
+            'uuid': uuid  # Include UUID in the response
         }
 
     except subprocess.CalledProcessError as e:
@@ -175,21 +177,27 @@ def process_video():
         data = request.json
         url = data.get('url')
         resolution = data.get('resolution')
+        uuid = data.get('uuid')  # Get UUID from request
 
-        print(f'Processing URL: {url} with resolution: {resolution}')
+        print(f'Processing URL: {url} with resolution: {resolution} and UUID: {uuid}')
 
         if not url:
             return jsonify({'error': 'URL is required'}), 400
+            
+        if not uuid:
+            return jsonify({'error': 'UUID is required'}), 400
 
-        # Start the Celery task
-        print('about toexecutre the process')
-        task = process_video_task.delay(url, resolution)
+        # Start the Celery task with UUID
+        print('about to execute the process')
+        task = process_video_task.delay(url, resolution, uuid)
         print('finished the process')
+        
         # Return the task ID so the client can check the status
         return jsonify({
             'task_id': task.id,
             'status': 'Processing',
-            'status_url': f'/api/task-status/{task.id}'
+            'status_url': f'/api/task-status/{task.id}',
+            'uuid': uuid  # Include UUID in the response
         })
 
     except Exception as e:
