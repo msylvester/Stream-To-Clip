@@ -130,20 +130,15 @@ def main():
         sys.exit(1)
 
     # Check command line arguments
-    if len(sys.argv) < 3 or len(sys.argv) > 4:
-        print("Usage: python process_video.py <twitch_url> <quality> [uuid]")
-        print("Example: python process_video.py https://www.twitch.tv/videos/1303894071 160p")
-        print("Example with UUID: python process_video.py https://www.twitch.tv/videos/1303894071 160p 123e4567-e89b-12d3-a456-426614174000")
+    if len(sys.argv) != 4:
+        print("Usage: python process_video.py <twitch_url> <quality> <uuid>")
+        print("Example: python process_video.py https://www.twitch.tv/videos/1303894071 160p 123e4567-e89b-12d3-a456-426614174000")
+        print("Error: UUID must be provided as the third argument")
         sys.exit(1)
 
     twitch_url = sys.argv[1]
     quality = sys.argv[2]
-    
-    # Use provided UUID or generate a new one
-    if len(sys.argv) == 4:
-        session_uuid = sys.argv[3]
-    else:
-        session_uuid = str(uuid.uuid4())
+    session_uuid = sys.argv[3]
     
     print(f"Using session UUID: {session_uuid}")
 
