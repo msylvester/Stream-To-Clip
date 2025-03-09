@@ -109,8 +109,18 @@ def process_video_task(self, url, resolution, uuid):
         if process.returncode != 0:
             raise subprocess.CalledProcessError(process.returncode, command, stdout, stderr)
 
-        # Get the clips directory path
-        clips_dir = mac_version_path / 'FeatureTranscribe' / 'clips'
+        # Extract video ID from the output or from URL
+        # Look for the video ID in the URL
+        try:
+            video_id = url.strip('/').split('/')[-1]
+        except:
+            video_id = None
+        
+        print(f"Extracted video ID: {video_id}")
+        
+        # Get the clips directory path - using the provided UUID and video ID structure
+        clips_dir = mac_version_path / uuid / 'FeatureTranscribe' / video_id / 'clips'
+        print(f"Looking for clips in: {clips_dir}")
         
         # Get all generated MP4 files in the clips directory
         generated_videos = []
@@ -118,8 +128,13 @@ def process_video_task(self, url, resolution, uuid):
             for file in clips_dir.glob('*.mp4'):
                 if file.is_file():
                     # Create a URL that points to our video serving endpoint
-                    video_url = f'http://localhost:5001/video/{file.name}'
+                    # Include UUID and video_id in the path to locate files correctly
+                    video_url = f'http://localhost:5001/video/{uuid}/{video_id}/{file.name}'
                     generated_videos.append(video_url)
+            
+            print(f"Found {len(generated_videos)} video clips")
+        else:
+            print(f"WARNING: Clips directory not found at {clips_dir}")
 
         # Return both the script output and the video URLs
         return {
@@ -127,7 +142,8 @@ def process_video_task(self, url, resolution, uuid):
             'videos': generated_videos,
             'script_output': stdout,
             'task_id': self.request.id,
-            'uuid': uuid  # Include UUID in the response
+            'uuid': uuid,  # Include UUID in the response
+            'video_id': video_id  # Include video ID in the response
         }
 
     except subprocess.CalledProcessError as e:
@@ -237,10 +253,12 @@ def task_status(task_id):
     
     return jsonify(response)
 
-@app.route('/video/<path:filename>')
-def serve_video(filename):
+@app.route('/video/<uuid>/<video_id>/<path:filename>')
+def serve_video(uuid, video_id, filename):
+    """Serve video files from the UUID and video_id specific directory."""
     mac_version_path = Path(__file__).parent / 'mac_version'
-    clips_path = mac_version_path / 'FeatureTranscribe' / 'clips'
+    # Updated path to match the directory structure we're looking for
+    clips_path = mac_version_path / uuid / 'FeatureTranscribe' / video_id / 'clips'
     
     print(f"Attempting to serve video: {filename}")
     print(f"Looking in path: {clips_path}")
