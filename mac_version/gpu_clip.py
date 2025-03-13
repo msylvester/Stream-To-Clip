@@ -214,6 +214,36 @@ def save_top_clips_json(clips: List[Dict], output_file: str, num_clips: int = 20
     except Exception as e:
         raise RuntimeError(f"Failed to save JSON file: {str(e)}")
 
+def cleanup_source_files(clips_json_path):
+    """Delete the original .ts file after processing is complete."""
+    try:
+        # Get the path to the enhanced transcription file
+        json_path = os.path.abspath(clips_json_path)
+        dir_path = os.path.dirname(json_path)
+        
+        # Find any .ts files in the directory
+        ts_files = [f for f in os.listdir(dir_path) if f.endswith('.ts')]
+        
+        if ts_files:
+            for ts_file in ts_files:
+                ts_file_path = os.path.join(dir_path, ts_file)
+                os.remove(ts_file_path)
+                print(f"Successfully deleted .ts file: {ts_file_path}")
+        else:
+            # Try parent directory if no .ts files found
+            parent_dir = os.path.dirname(dir_path)
+            ts_files = [f for f in os.listdir(parent_dir) if f.endswith('.ts')]
+            
+            if ts_files:
+                for ts_file in ts_files:
+                    ts_file_path = os.path.join(parent_dir, ts_file)
+                    os.remove(ts_file_path)
+                    print(f"Successfully deleted .ts file: {ts_file_path}")
+            else:
+                print(f"Note: No .ts files found in {dir_path} or its parent directory")
+    except Exception as e:
+        print(f"Warning: Failed to clean up source files: {str(e)}")
+
 def main():
     parser = argparse.ArgumentParser(description='Rank and extract top viral video clips metadata using GPU acceleration.')
     parser.add_argument('clips_json', help='JSON file containing clip information')
@@ -251,6 +281,9 @@ def main():
         )
         
         save_top_clips_json(ranked_clips, args.output_file, args.num_clips)
+        
+        # Clean up the source .ts file after successful processing
+        cleanup_source_files(args.clips_json)
         
         print(f"\nSuccessfully saved top {args.num_clips} clips to {args.output_file}")
         print(f"Total processing time: {time.time() - start_time:.2f} seconds")
