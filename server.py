@@ -187,7 +187,6 @@ def get_video_options():
 
 @app.route('/api/process-video', methods=['POST'])
 def process_video():
-    print('inside the route')
     
     try:
         data = request.json
@@ -297,6 +296,43 @@ def cancel_process(task_id):
         'success': True,
         'message': f'Task {task_id} has been cancelled'
     })
+
+
+'''
+implement a method that serves videos from a directory 
+NOTE: the vods are located at /mac_version/VODS/{vod_id}
+ Args:
+     vod_id(int): the vod you are selecting 
+
+    
+ Returns:
+     send_from_directory
+'''
+
+@app.route('/api/vod/<int:vod_id>', methods=['GET'])
+def serve_vod(vod_id):
+    """
+    List all clip filenames for a specific VOD ID.
+    
+    Args:
+        vod_id (int): The ID of the video to serve
+        
+    Returns:
+        return an array of Strings (the file names for all clips in the directory)
+    """
+    BASE_DIR = '/Users/mikress/flask_app'
+    #vod_directory = f'/mac_version/VODS/{vod_id}'
+    vod_directory = os.path.join(BASE_DIR, 'mac_version', 'VODS', str(vod_id))
+    # Check if directory exists
+    if not os.path.exists(vod_directory):
+        return jsonify({"error": f"VOD with ID {vod_id} not found"}), 404
+    
+    # Get all filenames in the directory
+    try:
+        filenames = os.listdir(vod_directory)
+        return jsonify(filenames)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5001, debug=True)
