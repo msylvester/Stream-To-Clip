@@ -25,27 +25,6 @@ Welcome to clipception! Clipception allows you to find the most viral clips on y
    python process_video_v2.py url_for_twitch_vod
    ```
 
-## ⚙️ System Requirements
-
-### Ubuntu/Debian:
-```bash
-sudo apt-get update && sudo apt-get install -y ffmpeg libsndfile1
-```
-
-### macOS:
-```bash
-brew install ffmpeg
-```
-## 📁 Project Structure
-
-```
-./
-├── process_video.py      # Main orchestrator
-├── transcription.py      # Transcription + audio analysis
-├── gpu_clip.py          # AI ranking
-├── clip.py              # Video extraction using subprocess
-└── requirements.txt
-```
 
 ## 🔍 Features
 
@@ -62,38 +41,4 @@ Files are organized in `FeatureTranscribe/`:
 - `top_clips_one.json` - Ranked clips
 - `clips/` - Extracted video segments
 
-## 🔧 Components
 
-1. **Transcription**
-   - Whisper model
-   - Audio feature extraction
-   - Emotional analysis
-
-2. **Clip Analysis**
-   - GPU acceleration
-   - Parallel processing
-   - Content scoring
-
-3. **Video Processing**
-   - Subprocess-based clip extraction
-   - Quality preservation
-   - Error handling and logging
-
-## ❗ Requirements
-
-See `requirements.txt` for full list. Key packages:
-- subprocess (Python standard library)
-- whisper
-- torch
-- openai
-- ffmpeg-python
-- librosa
-
-## 💡 Notes
-
-- Requires CUDA-compatible GPU for acceleration
-- Processing time varies with video length
-- Ensure sufficient disk space
-- Uses subprocess for more reliable video processing
-
-Would you like me to explain any specific part of these changes in more detail?
