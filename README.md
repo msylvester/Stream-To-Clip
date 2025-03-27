@@ -12,6 +12,11 @@ Welcome to clipception! Clipception allows you to find the most viral clips on y
 - **Twitch**: [twitch.tv/krystal_mess323](https://www.twitch.tv/krystal_mess323)
 - **YouTube**: [youtube.com/@krystal_mess323](https://www.youtube.com/@krystal_mess323)
 
+## 📺 In Action
+
+<p align="center">
+  <img src="clip_running.png" alt="Clipception in action" width="800"/>
+</p>
 
 ## 🚀 Quick Start
 
