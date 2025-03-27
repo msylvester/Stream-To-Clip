@@ -38,7 +38,7 @@ Welcome to clipception! Clipception allows you to find the most viral clips on y
 
 4. Run:
    ```bash
-   python process_video_v2.py url_for_twitch_vod
+   python process_video_v3.py url_for_twitch_vod
    ```
 
 
