@@ -2,6 +2,12 @@ Welcome to clipception! Clipception allows you to find the most viral clips on y
 
 # 🎥 Video Clip Extractor
 
+## 🔗 Links
+- **Web App**: [clipception.xyz](https://clipception.xyz)
+- **Twitch**: [twitch.tv/krystal_mess323](https://www.twitch.tv/krystal_mess323)
+- **YouTube**: [youtube.com/@krystal_mess323](https://www.youtube.com/@krystal_mess323)
+
+
 ## 🚀 Quick Start
 
 1. Create a conda environment with Python 3.10 or later:
