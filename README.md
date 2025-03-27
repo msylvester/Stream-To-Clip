@@ -1,6 +1,11 @@
 Welcome to clipception! Clipception allows you to find the most viral clips on your stream. This repo includes the flask app config (with celery) as well as the command line steps. 
 
-# 🎥 Video Clip Extractor
+<p align="center">
+  <img src="clip_logo.png" alt="Clipception Logo" width="200"/>
+</p>
+
+# 🎥 Clipception: Video Clip Extractor
+
 
 ## 🔗 Links
 - **Web App**: [clipception.xyz](https://clipception.xyz)
