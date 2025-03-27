@@ -1,4 +1,26 @@
-import whisper
+# Try different ways to import Whisper for compatibility
+try:
+    # Try standard import first
+    import openai.whisper as whisper
+except ImportError:
+    try:
+        # Try direct OpenAI import
+        from openai import whisper
+    except ImportError:
+        try:
+            # Try regular import (if OpenAI whisper is properly installed)
+            import whisper
+            # Verify it has the load_model attribute
+            if not hasattr(whisper, 'load_model'):
+                raise ImportError("Whisper module doesn't have load_model attribute")
+        except ImportError:
+            print("ERROR: Cannot import proper whisper module.")
+            print("Please install OpenAI's Whisper with:")
+            print("pip install git+https://github.com/openai/whisper.git")
+            import sys
+            sys.exit(1)
+
+# Rest of the original imports
 from pathlib import Path
 import json
 import argparse
@@ -12,6 +34,7 @@ import librosa
 import soundfile as sf
 import os
 import atexit
+import sys
 
 def format_time(seconds):
     """Convert seconds into human readable time string"""
