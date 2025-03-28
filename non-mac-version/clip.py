@@ -18,8 +18,15 @@ def extract_clip(input_file, output_dir, clip_data):
         # Load the video file
         video = VideoFileClip(input_file)
         
+        # Check if start and end times are valid numbers
+        start_time = clip_data.get("start")
+        end_time = clip_data.get("end")
+        
+        if start_time is None or end_time is None:
+            return False, f"Missing start or end time for clip: {clip_data['name']}"
+        
         # Extract the clip using start and end times from JSON
-        clip = video.subclip(clip_data["start"], clip_data["end"])
+        clip = video.subclip(start_time, end_time)
         
         # Write the clip to a new file
         clip.write_videofile(output_file, codec='libx264')
@@ -33,7 +40,7 @@ def extract_clip(input_file, output_dir, clip_data):
     except Exception as e:
         return False, str(e)
 
-def process_clips(input_file, output_dir, json_file, min_score=0):
+def process_clips(input_file, output_dir, json_file, min_score=0, remove_vod=False):
     """
     Process all clips from the JSON file that meet the minimum score requirement
     """
@@ -49,8 +56,8 @@ def process_clips(input_file, output_dir, json_file, min_score=0):
         successful_clips = []
         failed_clips = []
         
-        for clip in data["top_clips"]:
-            if clip["score"] >= min_score:
+        for clip in data.get("top_clips", []):
+            if clip.get("score", 0) >= min_score:
                 success, result = extract_clip(input_file, output_dir, clip)
                 if success:
                     successful_clips.append((clip["name"], result))
@@ -72,7 +79,8 @@ def process_clips(input_file, output_dir, json_file, min_score=0):
             print("\nFailed clips:")
             for name, error in failed_clips:
                 print(f"- {name}: {error}")
-        if successful_clips:
+                
+        if remove_vod and successful_clips:
             try:
                 os.remove(input_file)
                 print(f"\nOriginal VOD file removed: {input_file}")
@@ -90,10 +98,11 @@ def main():
     parser.add_argument('output_dir', help='Output directory for clips')
     parser.add_argument('json_file', help='JSON file containing clip information')
     parser.add_argument('--min-score', type=int, default=0, help='Minimum score threshold for clips (default: 0)')
+    parser.add_argument('--remove-vod', action='store_true', help='Remove the original VOD file after successful extraction')
     
     args = parser.parse_args()
     
-    process_clips(args.input_file, args.output_dir, args.json_file, args.min_score)
+    process_clips(args.input_file, args.output_dir, args.json_file, args.min_score, args.remove_vod)
 
 if __name__ == "__main__":
     main()
