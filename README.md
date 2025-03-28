@@ -1,5 +1,7 @@
 Welcome to clipception! Clipception allows you to find the most viral clips on your stream. This repo includes the flask app config (with celery) as well as the command line steps. 
 
+*NOTE: The entire process varies in the amount of ⏰. For a VOD in 1080p that is 4 hours or more it will take roughly 30 minutes for the process to complete
+
 <p align="center">
   <img src="clip_logo.png" alt="Clipception Logo" width="200"/>
 </p>
